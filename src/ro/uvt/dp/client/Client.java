@@ -1,9 +1,12 @@
 package ro.uvt.dp.client;
 
+import ro.uvt.*;
+import ro.uvt.dp.exceptions.*;
 import java.util.Arrays;
 
 import ro.uvt.dp.account.Account;
 import ro.uvt.dp.account.AccountEUR;
+import ro.uvt.dp.account.AccountFactory;
 import ro.uvt.dp.account.AccountRON;
 import ro.uvt.dp.account.Account.TYPE;
 
@@ -16,11 +19,20 @@ public class Client {
 	private String address;
 	private ArrayList<Account> accounts;
 
-	public Client(String nume, String adresa, TYPE tip, String numarCont, double suma) {
-		this.name = nume;
-		this.address = adresa;
+	public Client(ClientBuilder builder) 
+			throws DuplicateIBAN, ClientsLimitExceeded, InvalidTransferAmount {
+		this.name = builder.name;
+		this.address = builder.address;
+		
 		accounts = new ArrayList<Account>();
-		addAccount(tip, numarCont, suma);
+		
+		// If the builder has the account fields set then create one
+		if(builder.IBAN.length() > 0 && builder.type != null)
+		{
+			Account newAccount = AccountFactory.createAccount(builder.type, builder.IBAN, builder.sum);
+			addAccount(newAccount);
+		}
+
 	}
 	/**
 	 * Check if the account with the IBAN exists
@@ -44,39 +56,34 @@ public class Client {
 	 * @param numarCont - String
 	 * @param suma - Initial amount of money
 	 */
-	public void addAccount(TYPE tip, String numarCont, double suma) {
-		Account c = null;
-		if (tip == Account.TYPE.EUR)
-			c = new AccountEUR(numarCont, suma);
-		else if (tip == Account.TYPE.RON)
-			c = new AccountRON(numarCont, suma);
-		
-		if(this.ibanExists(numarCont))
+	public void addAccount(Account account) throws DuplicateIBAN, ClientsLimitExceeded  {
+			
+		if(this.ibanExists(account.getAccountNumber()))
 		{
-			System.out.println("Warning, Client addAccount IBAN already exists");
-			return;
+			throw new DuplicateIBAN("For the add operation, An account with the same IBAN exists.");
 		}
 		
 		if(accounts.size()<MAX_ACCOUNTS_NUMBER)
-			accounts.add(c);
+			accounts.add(account);
 		else
-			System.out.println("Error, "
-					+ "Client addAccount method over the limit of MAX_ACCOUNTS_NUMBER");
+			throw new ClientsLimitExceeded(
+					"Client addAccount method over the limit of MAX_ACCOUNTS_NUMBER");
 	}
+	
 
 	/**
 	 * Get the account if it is found
 	 * @param accountCode - String used to find the target account
 	 * @return account, or null if no account with accountCode is found 
 	 */
-	public Account getAccount(String accountCode) {
+	public Account getAccount(String accountCode) throws AccountNotFound{
 		for (int i = 0; i < accounts.size(); i++) {
 			String accountNr = accounts.get(i).getAccountNumber();
 			if (accountNr.equals(accountCode)) {
 				return accounts.get(i);
 			}
 		}
-		return null;
+		throw new AccountNotFound("No account found for the get operation");
 	}
 	
 	public int getNumberAccounts()
@@ -88,14 +95,18 @@ public class Client {
 	 * Delete the account with matching accountCode
 	 * @param accountCode - String
 	 */
-	public void deleteAccount(String accountCode)
+	public void deleteAccount(String accountCode) throws AccountNotFound
 	{
+		boolean foundAccount = false;
 		for (int i = 0; i < accounts.size(); i++) {
 			String accountNr = accounts.get(i).getAccountNumber();
 			if (accountNr.equals(accountCode)) {
 				accounts.remove(i);
+				foundAccount = true;
 			}
 		}
+		if(!foundAccount)
+			throw new AccountNotFound("No account found for the delete operation");
 	}
 
 	@Override

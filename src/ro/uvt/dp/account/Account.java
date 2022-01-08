@@ -1,5 +1,7 @@
 package ro.uvt.dp.account;
 
+import ro.uvt.dp.exceptions.InvalidTransferAmount;
+
 public abstract class Account implements Operations {
 
 	protected String iban = null;
@@ -9,9 +11,10 @@ public abstract class Account implements Operations {
 		EUR, RON
 	};
 
-	protected Account(String iban, double suma) {
+	protected Account(String iban, double suma) throws InvalidTransferAmount {
 		this.iban = iban;
 		depose(suma);
+	
 	}
 
 	@Override
@@ -26,21 +29,20 @@ public abstract class Account implements Operations {
 
 	
 	@Override
-	public void depose(double amount) {
+	public void depose(double amount) throws InvalidTransferAmount {
 
 		if(amount>0)
 			this.amount += amount;
 		else
-			System.out.println("Warning, Account depose negative or 0 value");
+			throw new InvalidTransferAmount("Account depose negative or 0 value");
 	}
 
 	@Override
-	public void retrieve(double amount) {
-		//first throw exception
+	public void retrieve(double amount) throws InvalidTransferAmount {
 		if(amount>0)
 			this.amount -= amount;
 		else
-			System.out.println("Warning, Account retrieve negative or 0 value");
+			throw new InvalidTransferAmount("Account retrieve negative or 0 value");
 	}
 
 	public String toString() {

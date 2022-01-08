@@ -1,9 +1,11 @@
 package ro.uvt.dp.account;
 
+import ro.uvt.dp.exceptions.InvalidTransferAmount;
+
 public class AccountRON extends Account implements Transfer {
 	
 
-	public AccountRON(String iban, double amount) {
+	public AccountRON(String iban, double amount) throws InvalidTransferAmount {
 		super(iban, amount);
 	}
 
@@ -33,7 +35,12 @@ public class AccountRON extends Account implements Transfer {
 	 * @param s - Double
 	 * Amount is converted to RON from EUR if the target is an EUR account
 	 */
-	public void transfer(Account target, double s) {
+	public void transfer(Account target, double s) throws InvalidTransferAmount {
+		
+		if(target.getAmount()<s)
+		{
+			throw new InvalidTransferAmount("The target account does not have enough money.");
+		}
 		target.retrieve(s);
 		Double amount = s;
 		if(target instanceof AccountEUR)
