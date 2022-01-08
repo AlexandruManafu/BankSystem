@@ -13,4 +13,6 @@ public interface Operations {
 	void depose(double amount) throws InvalidTransferAmount;
 
 	void retrieve(double amount) throws InvalidTransferAmount;
+	
+	void transfer(Account c, double s) throws InvalidTransferAmount;
 }

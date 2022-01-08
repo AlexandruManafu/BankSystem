@@ -2,7 +2,7 @@ package ro.uvt.dp.account;
 
 import ro.uvt.dp.exceptions.InvalidTransferAmount;
 
-public class AccountEUR extends Account implements Transfer {
+public class AccountEUR extends Account {
 	
 
 	public AccountEUR(String iban, double amount) throws InvalidTransferAmount {

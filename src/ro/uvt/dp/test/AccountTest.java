@@ -1,10 +1,12 @@
 package ro.uvt.dp.test;
 
+import ro.uvt.dp.account.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import ro.uvt.dp.account.Account;
+import ro.uvt.dp.account.Account.TYPE;
 import ro.uvt.dp.account.AccountEUR;
 import ro.uvt.dp.account.AccountFactory;
 import ro.uvt.dp.account.AccountRON;
@@ -141,8 +143,40 @@ public class AccountTest {
 		}
 	}
 	
+	@Test
+	public void testDecorators()
+	{
+		try {
+			Client cl = this.bcr.getClient("Marinescu Marin");
+			Account a1 = AccountFactory.createAccount(TYPE.RON, "0000", 100);
+			Account a2 = AccountFactory.createAccount(TYPE.RON, "0001", 100);
+			
+			a1 = new EconomyAccount(a1);
+			a2 = new PrivateInsuranceAccount(a2);
+			
+			cl.addAccount(a1);
+			cl.addAccount(a2);
+			
+			double amount1 = cl.getAccount("0000").getAmount();
+			double amount2 = cl.getAccount("0001").getAmount();
+			
+			double interest1 = a1.getInterest();
+			double interest2 = a2.getInterest();
+			
+			if(amount1 > amount2 && interest1 > interest2)
+				ClientTest.passTest();
+			else
+				fail("An economy account should have a higher interest"
+						+ " therefore an higher amount");
+			
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 	
-    public Bank createBCRBank()
+	
+    public static Bank createBCRBank()
 	{
     	Bank bcr = null;
     	try {

@@ -89,6 +89,7 @@ public class ClientTest {
 		ClientBuilder builder = new ClientBuilder();
 		builder = builder.name("Ionescu Ion");
 		builder = builder.address("Timisoara");
+		//builder.build
 		Client c = new Client(builder);
 		
 		String iban = "RON1234";

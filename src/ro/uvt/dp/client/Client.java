@@ -17,8 +17,10 @@ public class Client {
 
 	private String name;
 	private String address;
+	private Double cash;
 	private ArrayList<Account> accounts;
 
+	//make it package
 	public Client(ClientBuilder builder) 
 			throws DuplicateIBAN, ClientsLimitExceeded, InvalidTransferAmount {
 		this.name = builder.name;
@@ -33,6 +35,16 @@ public class Client {
 			addAccount(newAccount);
 		}
 
+	}
+	
+	public void addCash(double amount)
+	{
+		this.cash = this.cash + amount;
+	}
+	
+	public double getCash()
+	{
+		return this.cash;
 	}
 	/**
 	 * Check if the account with the IBAN exists
@@ -86,6 +98,11 @@ public class Client {
 		throw new AccountNotFound("No account found for the get operation");
 	}
 	
+	public ArrayList<Account> getAccounts()
+	{
+		return this.accounts;
+	}
+	
 	public int getNumberAccounts()
 	{
 		return accounts.size();
@@ -94,16 +111,19 @@ public class Client {
 	/**
 	 * Delete the account with matching accountCode
 	 * @param accountCode - String
+	 * @throws AccountNotEmpty 
 	 */
-	public void deleteAccount(String accountCode) throws AccountNotFound
+	public void deleteAccount(String accountCode) throws AccountNotFound, AccountNotEmpty
 	{
 		boolean foundAccount = false;
 		for (int i = 0; i < accounts.size(); i++) {
 			String accountNr = accounts.get(i).getAccountNumber();
-			if (accountNr.equals(accountCode)) {
+			if (accountNr.equals(accountCode) && accounts.get(i).getAmount()==0) {
 				accounts.remove(i);
 				foundAccount = true;
 			}
+			else if(accountNr.equals(accountCode))
+				throw new AccountNotEmpty("Cannot delete an account that has money in it.");
 		}
 		if(!foundAccount)
 			throw new AccountNotFound("No account found for the delete operation");
