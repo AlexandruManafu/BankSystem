@@ -1,4 +1,4 @@
-package ro.uvt.dp;
+package ro.uvt.dp.account;
 
 public abstract class Account implements Operations {
 
@@ -19,17 +19,28 @@ public abstract class Account implements Operations {
 
 		return amount + amount * getInterest();
 	}
+	
+	public double getAmount() {
+		return amount;
+	}
 
+	
 	@Override
 	public void depose(double amount) {
 
-		this.amount += amount;
+		if(amount>0)
+			this.amount += amount;
+		else
+			System.out.println("Warning, Account depose negative or 0 value");
 	}
 
 	@Override
 	public void retrieve(double amount) {
-
-		this.amount -= amount;
+		//first throw exception
+		if(amount>0)
+			this.amount -= amount;
+		else
+			System.out.println("Warning, Account retrieve negative or 0 value");
 	}
 
 	public String toString() {
