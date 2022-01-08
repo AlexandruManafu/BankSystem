@@ -1,5 +1,7 @@
 package ro.uvt.dp.account;
 
+import ro.uvt.dp.exceptions.InvalidTransferAmount;
+
 public interface Operations {
 	
 	double getRatioToEur();
@@ -8,7 +10,7 @@ public interface Operations {
 
 	double getInterest();
 
-	void depose(double amount);
+	void depose(double amount) throws InvalidTransferAmount;
 
-	void retrieve(double amount);
+	void retrieve(double amount) throws InvalidTransferAmount;
 }
