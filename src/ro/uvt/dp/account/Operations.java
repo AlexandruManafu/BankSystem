@@ -1,6 +1,9 @@
-package ro.uvt.dp;
+package ro.uvt.dp.account;
 
 public interface Operations {
+	
+	double getRatioToEur();
+	
 	double getTotalAmount();
 
 	double getInterest();
